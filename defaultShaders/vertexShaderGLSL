@@ -1,0 +1,15 @@
+precision mediump float;
+
+attribute vec3 POSITION;
+attribute vec3 NORMAL;
+attribute vec3 TANGENT;
+attribute vec2 TEXCOORD_0;
+
+uniform mat4 matrix;
+varying vec2 fragmentTextureCoordinate;
+void main()
+{
+  fragmentTextureCoordinate = TEXCOORD_0;
+  gl_Position =
+  matrix*vec4(POSITION, 1.0);
+}
