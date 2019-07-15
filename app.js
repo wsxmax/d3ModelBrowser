@@ -6,23 +6,17 @@ function broswerStart(){
   mainCanvas.height = 1080;
 
   var programReady = false;
-  var scene = null;
+  var mainScene = null;
+  keyDownCoord : vec2.create();
   var sceneReady = false;
   var rebindingNeeded = true;
 
-  var worldMatrix = new Float32Array(16);
-  mat4.identity(worldMatrix);
-  var projectMatrix = new Float32Array(16);
-  mat4.perspective(projectMatrix,glMatrix.toRadian(90),mainCanvas.width/mainCanvas.height,0.1,1000);
-  var worldMatrix = new Float32Array(16);
-  mat4.identity(worldMatrix);
-  var viewMatrix = new Float32Array(16);
-  mat4.lookAt(viewMatrix,[0,0,-10],[0,0,1],[0,1,0]);
-  var lensMatrix = new Float32Array(16);
-  mat4.multiply(lensMatrix,projectMatrix,viewMatrix);
-  var matrix = new Float32Array(16);
-  mat4.multiply(matrix,lensMatrix,worldMatrix);
+  mainCamera = new camera([0,0,-10],[0,0,1],[0,1,0],90,mainCanvas.width,mainCanvas.height,1000,10);
+  ghostCamera = new camera([0,0,-10],[0,0,1],[0,1,0],90,mainCanvas.width,mainCanvas.height,1000,10);
 
+
+  var matrix = new Float32Array(16);
+  mat4.identity(matrix);
 
   const gl = makeContextForCanvas(mainCanvas);
 
@@ -30,31 +24,7 @@ function broswerStart(){
 
 
 
-  //------------------------------------------------------------testcode---------------------------------------------------------------------------------------------
-  var render = function(renderMatrix){
-    for (var meshIndex = 0;meshIndex < scene.meshes.length;meshIndex++){
-      for(var primitiveIndex = 0;primitiveIndex < scene.meshes[meshIndex].primitives.length;primitiveIndex++){
-        gl.renderPrimitive(scene.meshes[meshIndex].primitives[primitiveIndex],renderMatrix);
-      }
-    }
-  }
-
-    var prepareForRender = function(callback){
-      console.log("preparing for rend");
-
-      //-------------------------------------------temp test------------------------------------------
-      for (var meshIndex = 0;meshIndex < scene.meshes.length;meshIndex++){
-        for(var primitiveIndex = 0;primitiveIndex < scene.meshes[meshIndex].primitives.length;primitiveIndex++){
-          gl.configureProgramForPrimitive(scene.meshes[meshIndex].primitives[primitiveIndex],gl.defaultProgram);
-        }
-        console.log("finishing Preparing");
-      }
-      gl.clearColor(1,1,1,1);
-      console.log("color should be cleared to white");
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.enable(gl.DEPTH_TEST);
-      callback();
-    }
+  //--------------------------------------------------------------------loop functions definition------------------------------------
 
     var beginLoop = function(){
       //render(matrix);
@@ -63,40 +33,32 @@ function broswerStart(){
     }
 
     var loop = function(){
-      var identityMatrix  = new Float32Array(16);
-      mat4.identity(identityMatrix);
       gl.clearColor(0,0,1,1);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      mat4.rotate(worldMatrix,identityMatrix,performance.now()/2000,[0,1,0]);
-      mat4.multiply(matrix,lensMatrix,worldMatrix);
-      render(matrix);
+      gl.renderScene(mainScene,mainCamera,matrix);
       requestAnimationFrame(loop);
     }
+//-------------------------------------------------------/loop function definitions-----------------------------------------------
 
-
-    //----------------------------------------------------------------------------/temptest-------------------------------------------------
-
-
-
-
-
-    gl.makeProgramFromURI('/shaders/vertexShaderGLSL','/shaders/fragmentShaderGLSL',function(renderProgram){
+//-----------------------------------------------------main process in order-----------------------------------------------------
+    gl.makeProgramFromURI('/shaders/defaultShaders/vertexShaderGLSL','/shaders/defaultShaders/fragmentShaderGLSL',function(renderProgram){
       gl.defaultProgram = renderProgram;
       programReady = true;
-      if (sceneReady) prepareForRender(beginLoop);
+      if (sceneReady) gl.prepareForRender(mainScene,beginLoop);
     });
-
-    gl.loadScene('/gltf/suzanne.gltf',function(jsonObject){
-      scene = jsonObject;
+    loadGltfFile('/gltf/suzanne.gltf',function(jsonObject){
+      const gltfObject = jsonObject;
+      mainScene = gltfObject.scenes[gltfObject.scene];
       console.log('scene loaded:');
-      console.log(scene);
-      scene.loadImagesFromPath(scene.originalPath);
-      scene.loadBufferFromPath(scene.originalPath,function(){
-        gl.bufferObject(scene);
+      console.log(mainScene);
+      gltfObject.loadImagesFromPath(gltfObject.originalPath);
+      gltfObject.loadBufferFromPath(gltfObject.originalPath,function(){
+        mainScene.skybox = new skybox('/skybox/textures.png');
+        gl.bufferObject(gltfObject);
         sceneReady = true;
-        if (programReady) prepareForRender(beginLoop);
+        if (programReady) gl.prepareForRender(mainScene,beginLoop);
       });
     });
   }
