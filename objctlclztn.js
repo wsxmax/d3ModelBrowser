@@ -10,22 +10,20 @@ var makeMaterialLocal = function(materialObject,primitiveObject,gltfObject){
           materialObject.pbrMetallicRoughness[keys[uniformIndex]].textCoord = 0;
         }
         var textCoordIndex =  "TEXCOORD_".concat(materialObject.pbrMetallicRoughness[keys[uniformIndex]].textCoord);
-        console.log('here comes texcoordinex',textCoordIndex);
         materialObject.pbrMetallicRoughness[keys[uniformIndex]].textureCoordAccessor = gltfObject.accessors[primitiveObject.attributes[textCoordIndex]];
-        console.log('here commt texture index',textureIndex);
         makeTextureLocal(gltfObject.textures[textureIndex]);
         materialObject.uniforms[keys[uniformIndex]] = gltfObject.textures[textureIndex];
+        materialObject.uniforms[keys[uniformIndex]].load = false;
+        gltfObject.textures[textureIndex].textureObjectLink = materialObject.uniforms[keys[uniformIndex]];
         if(!materialObject.uniforms[keys[uniformIndex]].hasOwnProperty('textureImage')){
           materialObject.uniforms[keys[uniformIndex]].textureImage = new Image();
         }
-        console.log('should have textureObject returned',gltfObject.textures[textureIndex]);
       }
       else{
         materialObject.uniforms[keys[uniformIndex]] = materialObject.pbrMetallicRoughness[keys[uniformIndex]];
       }
     }
   }
-  console.log('made material', materialObject.name,' local: ',materialObject);
 }
 
 var makeAccessorLocal = function(accessorObject, gltfObject){
@@ -38,7 +36,6 @@ var makePrimitiveLocal = function(primitiveObject,gltfObject){
   console.log(propertyNameList);
   primitiveObject.attributes.attributeAccessors = [];
   for (var attributeIndex = 0; attributeIndex < propertyNameList.length;attributeIndex ++){
-    console.log("key: ",propertyNameList[attributeIndex],"\nvalue: ",gltfObject.accessors[primitiveObject.attributes[propertyNameList[attributeIndex]]]);
     primitiveObject.attributes.attributeAccessors[propertyNameList[attributeIndex]] = gltfObject.accessors[primitiveObject.attributes[propertyNameList[attributeIndex]]];
   }
   primitiveObject.materialObject = gltfObject.materials[primitiveObject.material];

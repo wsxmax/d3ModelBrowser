@@ -33,7 +33,7 @@ function broswerStart(){
     }
 
     var loop = function(){
-      gl.clearColor(0,0,1,1);
+      gl.clearColor(0,0,0,1);
       gl.clear(gl.COLOR_BUFFER_BIT);
       gl.clear(gl.DEPTH_BUFFER_BIT);
 
@@ -50,6 +50,7 @@ function broswerStart(){
     });
     loadGltfFile('/gltf/suzanne.gltf',function(jsonObject){
       const gltfObject = jsonObject;
+      console.log('showing the ObjectStructure',gltfObject);
       mainScene = gltfObject.scenes[gltfObject.scene];
       console.log('scene loaded:');
       console.log(mainScene);

@@ -1,15 +1,9 @@
 precision mediump float;
 
-attribute vec3 skyPOSITION;
-attribute vec3 NORMAL;
-attribute vec3 TANGENT;
-attribute vec2 TEXCOORD;
+attribute vec2 skyPOSITION;
 
-uniform mat4 matrix;
-varying vec2 fragmentTextureCoordinate;
 void main()
 {
-  fragmentTextureCoordinate = TEXCOORD;
-  vec4 position = matrix*vec4(skyPOSITION, 1.0);
+  vec4 position = vec4(skyPOSITION,1.0,1.0);
   gl_Position = vec4(position.x,position.y,position.z,position.w);
 }

@@ -3,7 +3,6 @@ var LoadTextContent = function(url,callback){
   request.open('GET',url,true);
   request.onload = function(){
     if(request.status >=200 && request.status < 300){
-      console.log("textContentLoaded:"+url);
       callback(null,request.responseText);
     } else {
       callback('error:' + request.status);
@@ -29,7 +28,6 @@ var LoadBinaryBuffer = function(url,callback){
       callback(null,reader.result);
     }
     if(request.status >=200 && request.status < 300){
-      console.log("textContentLoaded:"+url);
       reader.readAsArrayBuffer(request.response);
     }else {
       callback('error'+request.status);
