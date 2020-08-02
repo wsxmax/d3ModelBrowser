@@ -255,8 +255,69 @@ function extendRenderContext (contextObject){
               primitiveObject.materialObject.uniforms[uniformKey].textureImage = new Image();
               primitiveObject.materialObject.uniforms[uniformKey].refreshTexture = function(){
                 contextObject.useProgram(renderProgram);
+                var textureSlot = -1;
+                if(primitiveObject.materialObject.uniforms[uniformKey].hasOwnProperty('textureObject')){
+                  if(primitiveObject.materialObject.uniforms[uniformKey].textureObject.hasOwnProperty('slot')){
+                    textureSlot = primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot;
+                    console.log('having fucking slot what are you doing');
+                  }else{
+                    primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
+                    textureSlot = contextObject.textureSlotArray.alloc();
+                    primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
+                    contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
+                    contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
+                    contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
+                    contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
+                    contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
+                    contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
+                    contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,primitiveObject.materialObject.uniforms[uniformKey].textureImage);
+                    contextObject.uniform1i(contextObject.getUniformLocation(renderProgram,uniformKey),textureSlot);
+                    console.log('texture ', uniformKey,' is using slot:',textureSlot,'refreshed');
+                    console.log('have textureObject but no slot fucinging??????????');
+                  }
+                }
+                else{
+                  primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
+                  textureSlot = contextObject.textureSlotArray.alloc();
+                  primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
+                  contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
+                  contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
+                  contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,primitiveObject.materialObject.uniforms[uniformKey].textureImage);
+                  contextObject.uniform1i(contextObject.getUniformLocation(renderProgram,uniformKey),textureSlot);
+                  console.log('texture ', uniformKey,' is using slot:',textureSlot,'refreshed');
+                  console.log('having no fucking textureObject?!?!?!?!!?!?!?!?!?');
+                }
+              }
+            }else {
+              contextObject.useProgram(renderProgram);
+              var textureSlot = -1;
+              if(primitiveObject.materialObject.uniforms[uniformKey].hasOwnProperty('textureObject')){
+                if(primitiveObject.materialObject.uniforms[uniformKey].textureObject.hasOwnProperty('slot')){
+                  textureSlot = primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot;
+                  console.log('having fucking slot what are you doing');
+                }else{
+                  primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
+                  textureSlot = contextObject.textureSlotArray.alloc();
+                  primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
+                  contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
+                  contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
+                  contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
+                  contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,primitiveObject.materialObject.uniforms[uniformKey].textureImage);
+                  contextObject.uniform1i(contextObject.getUniformLocation(renderProgram,uniformKey),textureSlot);
+                  console.log('texuture ', uniformKey,' is using slot:',textureSlot);
+                  console.log('having textureObject but no slot???????');
+                }
+              }
+              else{
                 primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
-                var textureSlot = contextObject.textureSlotArray.alloc();
+                textureSlot = contextObject.textureSlotArray.alloc();
                 primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
                 contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
                 contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
@@ -266,22 +327,9 @@ function extendRenderContext (contextObject){
                 contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
                 contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,primitiveObject.materialObject.uniforms[uniformKey].textureImage);
                 contextObject.uniform1i(contextObject.getUniformLocation(renderProgram,uniformKey),textureSlot);
-                console.log('texture ', uniformKey,' is using slot:',textureSlot,'refreshed');
+                console.log('texuture ', uniformKey,' is using slot:',textureSlot);
+                console.log('have no textureObject fucinging??????????');
               }
-            }else {
-              contextObject.useProgram(renderProgram);
-              primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
-              var textureSlot = contextObject.textureSlotArray.alloc();
-              primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
-              contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
-              contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
-              contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
-              contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
-              contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
-              contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
-              contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,primitiveObject.materialObject.uniforms[uniformKey].textureImage);
-              contextObject.uniform1i(contextObject.getUniformLocation(renderProgram,uniformKey),textureSlot);
-              console.log('texuture ', uniformKey,' is using slot:',textureSlot);
             }
             break;
           }
@@ -293,9 +341,9 @@ function extendRenderContext (contextObject){
 
   contextObject.renderPrimitive = function(primitiveObject,matrix,camera){
     contextObject.usingProgram = primitiveObject.materialObject.program;
-    if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=primitiveObject.indicesAccessor.bufferViewObject.renderBuffer){
+    //if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=primitiveObject.indicesAccessor.bufferViewObject.renderBuffer){
       contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,primitiveObject.indicesAccessor.bufferViewObject.renderBuffer);
-    }
+    //}
     if(primitiveObject.materialObject.hasOwnProperty('program')){
       if(contextObject.getParameter(contextObject.CURRENT_PROGRAM) != primitiveObject.materialObject.program){
         contextObject.useProgram(primitiveObject.materialObject.program);
