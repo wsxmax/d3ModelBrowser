@@ -1,9 +1,13 @@
 precision mediump float;
 
 attribute vec2 skyPOSITION;
-
+uniform vec3 skyboxFactor;
+uniform mat4 cameraMatrix;
+varying vec3 skyboxTextureVector;
 void main()
 {
-  vec4 position = vec4(skyPOSITION,1.0,1.0);
-  gl_Position = vec4(position.x,position.y,position.z,position.w);
+  //vec4 position = vec4(skyPOSITION,0.0,1.0);
+  vec4 pixelVector = cameraMatrix*(vec4(skyPOSITION.x*skyboxFactor.x,skyPOSITION.y*skyboxFactor.y,skyboxFactor.z,1.0));
+  skyboxTextureVector = normalize(vec3(pixelVector.x,pixelVector.y,pixelVector.z));
+  gl_Position = vec4(skyPOSITION,0.999999,1.0);
 }

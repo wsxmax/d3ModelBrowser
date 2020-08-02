@@ -1,15 +1,43 @@
 class skybox {
-  constructor(imageSource){
-    var self = this;
-    this.load = false;
-    this.imageSource = imageSource;
-    this.textureImage = new Image();
-    this.textureImage.src = imageSource;
-    this.refreshTexture = function(){}
-    this.textureImage.onload = function(){
-      self.load = true;
-      self.refreshTexture();
+  constructor(directory, imageForm){
+    var _this = this;
+    this.left = new Image();
+    this.right = new Image();
+    this.top = new Image();
+    this.bottom = new Image();
+    this.front = new Image();
+    this.back = new Image();
+    this.left.src = directory+'/left.'+imageForm;
+    this.right.src = directory+'/right.'+imageForm;
+    this.top.src = directory+'/top.'+imageForm;
+    this.bottom.src = directory+'/bottom.'+imageForm;
+    this.front.src = directory+'/front.'+imageForm;
+    this.back.src = directory+'/back.'+imageForm;
+    this.left.onload = function(){
+      _this.leftLoaded();
     }
+    this.right.onload = function(){
+      _this.rightLoaded();
+    }
+    this.top.onload = function(){
+      _this.topLoaded();
+    }
+    this.bottom.onload = function(){
+      _this.bottomLoaded();
+    }
+    this.front.onload = function(){
+      _this.frontLoaded();
+    }
+    this.back.onload = function(){
+      _this.backLoaded();
+    }
+    this.leftLoaded = function(){}
+    this.rightLoaded = function(){}
+    this.topLoaded = function(){}
+    this.bottomLoaded = function(){}
+    this.frontLoaded = function(){}
+    this.backLoaded = function(){}
+    return this;
   }
 }
 
@@ -140,70 +168,78 @@ function extendRenderContext (contextObject){
   }
 
   contextObject.configureProgramForSkybox = function(skybox){
-    console.log("configuring for skybox");
-    if(skybox.load){
-      var skyBoxTexture = contextObject.createTexture();
-      const skyBoxTextureSlot = contextObject.textureSlotArray.alloc();
-      contextObject.useProgram(contextObject.skyboxRenderProgram);
-      contextObject.activeTexture(contextObject.TEXTURE0 + skyBoxTextureSlot);
-      contextObject.bindTexture(contextObject.TEXTURE_2D,skyBoxTexture);
-      skyBoxTexture.slot = skyBoxTextureSlot;
-      contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
-      contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
-      contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
-      contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
-      contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.textureImage);
-      console.log('the image should be loaded already',skybox.textureImage);
-      contextObject.uniform1i(contextObject.getUniformLocation(contextObject.skyboxRenderProgram,'skyBoxTexture'),skyBoxTextureSlot);
-      }else{
-        skybox.refreshTexture = function(){
-          var skyBoxTexture = contextObject.createTexture();
-          contextObject.useProgram(contextObject.skyboxRenderProgram);
-          const skyBoxTextureSlot = contextObject.textureSlotArray.alloc();
-          console.log('alloced for skybox texture a slot: ',skyBoxTextureSlot);
-          contextObject.activeTexture(contextObject.TEXTURE0 + skyBoxTextureSlot);
-          contextObject.bindTexture(contextObject.TEXTURE_2D,skyBoxTexture);
-          skyBoxTexture.slot = skyBoxTextureSlot;
-          contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
-          contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_T,contextObject.CLAMP_TO_EDGE);
-          contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MAG_FILTER,contextObject.LINEAR);
-          contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_MIN_FILTER,contextObject.LINEAR);
-          contextObject.texImage2D(contextObject.TEXTURE_2D,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.textureImage);
-          console.log('the image should be loaded already',skybox.textureImage);
-          contextObject.uniform1i(contextObject.getUniformLocation(contextObject.skyboxRenderProgram,'skyBoxTexture'),skyBoxTextureSlot);
-        }
+    var renderProgram = contextObject.skyboxRenderProgram;
+    contextObject.skyboxTexture = contextObject.createTexture();
+    var skyboxTextureSlot = contextObject.textureSlotArray.alloc();
+    contextObject.skyboxTexture.slot = skyboxTextureSlot;
+    contextObject.activeTexture(contextObject.TEXTURE0 + skyboxTextureSlot);
+    contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+    //contextObject.generateMipmap(contextObject.skyBoxTexture);
+    contextObject.texParameteri(contextObject.TEXTURE_CUBE_MAP, contextObject.TEXTURE_MAG_FILTER, contextObject.NEAREST);
+    contextObject.texParameteri(contextObject.TEXTURE_CUBE_MAP, contextObject.TEXTURE_MIN_FILTER, contextObject.NEAREST);
+    //contextObject.texParameteri(contextObject.TEXTURE_CUBE_MAP, contextObject.TEXTURE_WRAP_R, contextObject.CLAMP_TO_EDGE);
+    contextObject.texParameteri(contextObject.TEXTURE_CUBE_MAP, contextObject.TEXTURE_WRAP_S, contextObject.CLAMP_TO_EDGE);
+    contextObject.texParameteri(contextObject.TEXTURE_CUBE_MAP, contextObject.TEXTURE_WRAP_T, contextObject.CLAMP_TO_EDGE);
+    if(skybox.left.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_X,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.left);
+      contextObject.generateMipmap(contextObject.TEXTURE_CUBE_MAP);
+    }else{
+      skybox.leftLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_X,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.left);
+        console.log('I saw the Images coming and loading and rendering');
       }
-
-
+    }
+    if(skybox.right.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_X,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.right);
+    }else{
+      skybox.rightLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_X,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.right);
+      }
+    }
+    if(skybox.top.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_Y,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.top);
+    }else{
+      skybox.topLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_Y,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.top);
+      }
+    }
+    if(skybox.bottom.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_Y,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.bottom);
+    }else{
+      skybox.bottomLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_Y,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.bottom);
+      }
+    }
+    if(skybox.front.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_Z,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.front);
+    }else{
+      skybox.frontLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_POSITIVE_Z,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.front);
+      }
+    }
+    if(skybox.back.load){
+      contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_Z,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.back);
+    }else{
+      skybox.backLoaded = function(){
+        contextObject.bindTexture(contextObject.TEXTURE_CUBE_MAP, contextObject.skyboxTexture);
+        contextObject.texImage2D(contextObject.TEXTURE_CUBE_MAP_NEGATIVE_Z,0,contextObject.RGBA,contextObject.RGBA,contextObject.UNSIGNED_BYTE,skybox.back);
+      }
+    }
+    console.log('currentAvailableSlot is ',skyboxTextureSlot);
+    contextObject.environmentTextureSlot = skyboxTextureSlot;
+    contextObject.activeTexture(contextObject.TEXTURE0 + skyboxTextureSlot);
   }
-
 
   contextObject.configureProgramForPrimitive = function(primitiveObject){
     if((!primitiveObject.materialObject.hasOwnProperty('program'))||primitiveObject.materialObject.program == null){
       primitiveObject.materialObject.program = contextObject.defaultProgram;
     }
     var renderProgram = primitiveObject.materialObject.program;
-    var attributeCount = contextObject.getProgramParameter(renderProgram,contextObject.ACTIVE_ATTRIBUTES);
-    contextObject.useProgram(renderProgram);
-    for (var attributeIndex = 0;attributeIndex < attributeCount; attributeIndex ++){
-      var attributeKey = contextObject.getActiveAttrib(renderProgram,attributeIndex).name;
-      var attributeLocation = contextObject.getAttribLocation(renderProgram,attributeKey);
-      contextObject.bindBuffer(contextObject.ARRAY_BUFFER,primitiveObject.attributes.attributeAccessors[attributeKey].bufferViewObject.renderBuffer);
-      console.log("current attributeAccessors: ",primitiveObject.attributes.attributeAccessors);
-      console.log('getting attributes Location:',attributeKey,primitiveObject.attributes.attributeAccessors[attributeKey]);
-      console.log('buffer bound to vao as attribute: ',attributeKey);
-      contextObject.vertexAttribPointer(
-        attributeLocation,
-        contextObject.attributeSize(primitiveObject.attributes.attributeAccessors[attributeKey].type),
-        primitiveObject.attributes.attributeAccessors[attributeKey].componentType,
-        contextObject.FLOAT,
-        contextObject.TRUE,
-        primitiveObject.attributes.attributeAccessors[attributeKey].bufferViewObject.byteStride,
-        primitiveObject.attributes.attributeAccessors[attributeKey].byteOffset
-      );
-      //contextObject.enableVertexAttribArray(attributeLocation);
-      contextObject.bindBuffer(contextObject.ARRAY_BUFFER,null);
-    }
 
     var uniformCount = contextObject.getProgramParameter(renderProgram,contextObject.ACTIVE_UNIFORMS);
     for (var uniformIndex = 0;uniformIndex < uniformCount;uniformIndex++){
@@ -221,6 +257,7 @@ function extendRenderContext (contextObject){
                 contextObject.useProgram(renderProgram);
                 primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
                 var textureSlot = contextObject.textureSlotArray.alloc();
+                primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
                 contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
                 contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
                 contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
@@ -235,6 +272,7 @@ function extendRenderContext (contextObject){
               contextObject.useProgram(renderProgram);
               primitiveObject.materialObject.uniforms[uniformKey].textureObject = contextObject.createTexture();
               var textureSlot = contextObject.textureSlotArray.alloc();
+              primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot = textureSlot;
               contextObject.activeTexture(contextObject.TEXTURE0 + textureSlot);
               contextObject.bindTexture(contextObject.TEXTURE_2D,primitiveObject.materialObject.uniforms[uniformKey].textureObject);
               contextObject.texParameteri(contextObject.TEXTURE_2D,contextObject.TEXTURE_WRAP_S,contextObject.CLAMP_TO_EDGE);
@@ -254,31 +292,32 @@ function extendRenderContext (contextObject){
 
 
   contextObject.renderPrimitive = function(primitiveObject,matrix){
-    var usingProgram = primitiveObject.materialObject.program;
+    contextObject.usingProgram = primitiveObject.materialObject.program;
     if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=primitiveObject.indicesAccessor.bufferViewObject.renderBuffer){
-      console.log('rebind indices buffer');
       contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,primitiveObject.indicesAccessor.bufferViewObject.renderBuffer);
     }
     if(primitiveObject.materialObject.hasOwnProperty('program')){
       if(contextObject.getParameter(contextObject.CURRENT_PROGRAM) != primitiveObject.materialObject.program){
         contextObject.useProgram(primitiveObject.materialObject.program);
-        usingProgram = primitiveObject.materialObject.program;
+        contextObject.usingProgram = primitiveObject.materialObject.program;
       }else{
-        usingProgram = contextObject.getParameter(contextObject.CURRENT_PROGRAM);
+        contextObject.usingProgram = contextObject.getParameter(contextObject.CURRENT_PROGRAM);
       }
     }else{
       if(contextObject.getParameter(contextObject.CURRENT_PROGRAM) != contextObject.defaultProgram && contextObject.defaultProgram != null){
         contextObject.useProgram(contextObject.defaultProgram);
-        usingProgram = contextObject.defaultProgram;
+        contextObject.usingProgram = contextObject.defaultProgram;
       }else{
         contextObject.useProgram(contextObject.defaultProgram);
-        usingProgram = contextObject.defaultProgram;
+        contextObject.usingProgram = contextObject.defaultProgram;
         //????????????????????????????????????????????????????????????????????????
       }
     }
-    for (var attributeIndex = 0;attributeIndex < contextObject.getProgramParameter(usingProgram,contextObject.ACTIVE_ATTRIBUTES); attributeIndex ++){
-      var attributeKey = contextObject.getActiveAttrib(usingProgram,attributeIndex).name;
-      var attributeLocation = contextObject.getAttribLocation(usingProgram,attributeKey);
+    var attributeCount = contextObject.getProgramParameter(contextObject.usingProgram,contextObject.ACTIVE_ATTRIBUTES);
+    contextObject.useProgram(contextObject.usingProgram);
+    for (var attributeIndex = 0;attributeIndex < attributeCount; attributeIndex ++){
+      var attributeKey = contextObject.getActiveAttrib(contextObject.usingProgram,attributeIndex).name;
+      var attributeLocation = contextObject.getAttribLocation(contextObject.usingProgram,attributeKey);
       contextObject.bindBuffer(contextObject.ARRAY_BUFFER,primitiveObject.attributes.attributeAccessors[attributeKey].bufferViewObject.renderBuffer);
       contextObject.vertexAttribPointer(
         attributeLocation,
@@ -291,7 +330,23 @@ function extendRenderContext (contextObject){
       );
       contextObject.enableVertexAttribArray(attributeLocation,attributeKey);
     }
-    var matrixLocation = contextObject.getUniformLocation(usingProgram,'matrix');
+
+    var uniformCount = contextObject.getProgramParameter(contextObject.usingProgram,contextObject.ACTIVE_UNIFORMS);
+    for (var uniformIndex = 0;uniformIndex < uniformCount;uniformIndex++){
+      var uniformKey = contextObject.getActiveUniform(contextObject.usingProgram,uniformIndex).name;
+      switch(contextObject.getActiveUniform(contextObject.usingProgram,uniformIndex).type){
+        case contextObject.SAMPLER_2D:{
+          contextObject.uniform1i(contextObject.getUniformLocation(contextObject.usingProgram,uniformKey),primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot);
+          break;
+        }
+        case contextObject.SAMPLER_CUBE:{
+          contextObject.uniform1i(contextObject.getUniformLocation(contextObject.usingProgram,uniformKey),primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot);
+          break;
+        }
+        default: break;
+      }
+    }
+    var matrixLocation = contextObject.getUniformLocation(contextObject.usingProgram,'matrix');
     contextObject.uniformMatrix4fv(matrixLocation,contextObject.FALSE,matrix);
     contextObject.drawElements(contextObject.TRIANGLES,primitiveObject.indicesAccessor.count,contextObject.UNSIGNED_SHORT,primitiveObject.indicesAccessor.byteOffset);
 
@@ -314,7 +369,7 @@ function extendRenderContext (contextObject){
     }
   }
 
-  /*contextObject.makeProgramFromURI('/shaders/skyboxShaders/vertexShaderGLSL','/shaders/skyboxShaders/fragmentShaderGLSL',function(skyboxProgram){
+  contextObject.makeProgramFromURI('/shaders/skyboxShaders/vertexShaderGLSL','/shaders/skyboxShaders/fragmentShaderGLSL',function(skyboxProgram){
     contextObject.skyboxRenderProgram = skyboxProgram;
     var verticesBuffer = contextObject.createBuffer();
     var verticiesIndicesBuffer = contextObject.createBuffer();
@@ -325,39 +380,44 @@ function extendRenderContext (contextObject){
       1,-1
     ];
     var verticesIndices = [
-      0,1,2,
-      2,3,0
+      0,3,2,
+      2,1,0
     ];
     contextObject.useProgram(contextObject.skyboxRenderProgram);
     contextObject.bindBuffer(contextObject.ARRAY_BUFFER,verticesBuffer);
     contextObject.bufferData(contextObject.ARRAY_BUFFER,new Float32Array(vertices),contextObject.STATIC_DRAW);
     contextObject.skyboxVerticesBuffer = verticesBuffer;
-    contextObject.vertexAttribPointer(
-      contextObject.getAttribLocation(contextObject.skyboxRenderProgram,'skyPOSITION'),
-      2,
-      contextObject.FLOAT,
-      contextObject.FALSE,
-      2*Float32Array.BYTES_PER_ELEMENT,
-      0
-    );
-    contextObject.skyboxarraybuffer = verticesBuffer;
     contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,verticiesIndicesBuffer);
     contextObject.bufferData(contextObject.ELEMENT_ARRAY_BUFFER,new Uint16Array(verticesIndices),contextObject.STATIC_DRAW);
     contextObject.skyboxElementArrayBuffer = verticiesIndicesBuffer;
-    contextObject.enableVertexAttribArray(contextObject.getAttribLocation(contextObject.skyboxRenderProgram,'skyPOSITION'));
     contextObject.bindBuffer(contextObject.ARRAY_BUFFER,null);
     contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,null);
-  });*/
+  });
 
   contextObject.renderSkybox = function(skybox,camera){
     if(contextObject.hasOwnProperty('skyboxRenderProgram')){
-      if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=contextObject.skyboxElementArrayBuffer){
+      contextObject.usingProgram = contextObject.skyboxRenderProgram;
+      //if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=contextObject.skyboxElementArrayBuffer){
         contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,contextObject.skyboxElementArrayBuffer);
-      }
-      contextObject.bindBuffer(contextObject.ARRAY_BUFFER,contextObject.skyboxVerticesBuffer);
+      //}
       contextObject.useProgram(contextObject.skyboxRenderProgram);
+      contextObject.bindBuffer(contextObject.ARRAY_BUFFER,contextObject.skyboxVerticesBuffer);
+      contextObject.vertexAttribPointer(
+        contextObject.getAttribLocation(contextObject.skyboxRenderProgram,'skyPOSITION'),
+        2,
+        contextObject.FLOAT,
+        contextObject.FALSE,
+        2*Float32Array.BYTES_PER_ELEMENT,
+        0
+      );
+      contextObject.enableVertexAttribArray(contextObject.getAttribLocation(contextObject.skyboxRenderProgram,'skyPOSITION'));
+      contextObject.uniform1i(contextObject.getUniformLocation(contextObject.skyboxRenderProgram,'skyboxTexture'),contextObject.skyboxTexture.slot);
+      contextObject.uniform3fv(contextObject.getUniformLocation(contextObject.skyboxRenderProgram,'skyboxFactor'),camera.generateFactorForSkybox());
+      contextObject.uniformMatrix4fv(contextObject.getUniformLocation(contextObject.skyboxRenderProgram,'cameraMatrix'),contextObject.FALSE,camera.generateSkyVectorMatrix());
       contextObject.clear(contextObject.COLOR_BUFFER_BIT);
+      contextObject.clear(contextObject.DEPTH_BUFFER_BIT);
       contextObject.drawElements(contextObject.TRIANGLES,6,contextObject.UNSIGNED_SHORT,0);
+      //contextObject.drawArrays(contextObject.TRIANGLES,0,6);
     }
   }
 
@@ -388,9 +448,9 @@ function extendRenderContext (contextObject){
     var renderMatrix = new Float32Array(16);
     var cameraMatrix = camera.generateMatrix();
     mat4.multiply(renderMatrix,cameraMatrix,sceneObject.sceneMatrix);
-    //if(sceneObject.hasOwnProperty('skybox')&&sceneObject.skybox!=null&&sceneObject.skybox.load){
-      //contextObject.renderSkybox(sceneObject.skybox,camera);
-    //}
+    if(sceneObject.hasOwnProperty('skybox')&&sceneObject.skybox!=null/*&&sceneObject.skybox.load*/){
+      contextObject.renderSkybox(sceneObject.skybox,camera);
+    }
     for(var nodeIndex = 0;nodeIndex < sceneObject.nodes.length;nodeIndex ++){
       contextObject.renderNode(sceneObject.nodeObject[nodeIndex],renderMatrix);
     }
@@ -417,8 +477,9 @@ function extendRenderContext (contextObject){
   contextObject.prepareForRender = function(sceneObject,callback){
     console.log("preparing for rend",sceneObject);
     if(sceneObject.hasOwnProperty('skybox')){
-      //contextObject.configureProgramForSkybox(sceneObject.skybox);
-      //console.log('configuring for skyBox');
+      console.log(skybox);
+      console.log(skybox.left);
+      contextObject.configureProgramForSkybox(sceneObject.skybox);
     }
     for(var nodeIndex = 0; nodeIndex < sceneObject.nodeObject.length; nodeIndex ++){
       contextObject.configureProgramForNode(sceneObject.nodeObject[nodeIndex]);

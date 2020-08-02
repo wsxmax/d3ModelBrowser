@@ -1,7 +1,7 @@
 precision mediump float;
-//uniform sampler2D skyBoxTexture;
+uniform samplerCube skyboxTexture;
+varying vec3 skyboxTextureVector;
 void main()
 {
-  //gl_FragColor = texture2D(skyBoxTexture,fragmentTextureCoordinate);
-  gl_FragColor = vec4(1.0,1.0,1.0,1.0);
+  gl_FragColor = textureCube(skyboxTexture,skyboxTextureVector);
 }

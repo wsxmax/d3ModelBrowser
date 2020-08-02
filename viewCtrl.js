@@ -59,6 +59,7 @@ class camera {
     this.horizontalAxis = vec3.create();
     vec3.cross(this.horizontalAxis,this.direction,this.upward);
     vec3.normalize(this.horizontalAxis,this.horizontalAxis);
+    console.log('this has a width of: ',this.width);
   }
 
   generateMatrixForSkybox(){
@@ -75,6 +76,16 @@ class camera {
     return cameraMatrix;
   }
 
+  generateFactorForSkybox(){
+    return [this.width/2,this.height/2,-this.height/(2*Math.tan(this.viewAngle/2))];
+  }
+
+  generateSkyVectorMatrix(){
+    var matrix = new Float32Array(16);
+    mat4.lookAt(matrix,[0,0,0],this.direction,this.upward);
+    mat4.invert(matrix,matrix);
+    return matrix;
+  }
 
   generateMatrix (){
     var origin = vec3.create();

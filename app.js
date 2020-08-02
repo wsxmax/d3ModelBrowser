@@ -34,8 +34,8 @@ function broswerStart(){
 
     var loop = function(){
       gl.clearColor(0,0,0,1);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.clear(gl.DEPTH_BUFFER_BIT);
+      //gl.clear(gl.COLOR_BUFFER_BIT);
+      //gl.clear(gl.DEPTH_BUFFER_BIT);
 
       gl.renderScene(mainScene,mainCamera,matrix);
       requestAnimationFrame(loop);
@@ -56,7 +56,7 @@ function broswerStart(){
       console.log(mainScene);
       gltfObject.loadImagesFromPath(gltfObject.originalPath);
       gltfObject.loadBufferFromPath(gltfObject.originalPath,function(){
-        mainScene.skybox = new skybox('/skybox/textures.png');
+        mainScene.skybox = new skybox('/skybox','png');
         gl.bufferObject(gltfObject);
         sceneReady = true;
         if (programReady) gl.prepareForRender(mainScene,beginLoop);
