@@ -6,9 +6,17 @@ attribute vec3 TANGENT;
 attribute vec2 TEXCOORD_0;
 
 uniform mat4 matrix;
+uniform vec3 cameraCoord;
+
 varying vec2 fragmentTextureCoordinate;
+varying vec3 normalVector;
+varying vec3 cameraLocation;
+varying vec3 vertexLocation;
 void main()
 {
+  cameraLocation = cameraCoord;
+  vertexLocation = POSITION;
+  normalVector = NORMAL;
   fragmentTextureCoordinate = TEXCOORD_0;
   gl_Position =
   matrix*vec4(POSITION, 1.0);

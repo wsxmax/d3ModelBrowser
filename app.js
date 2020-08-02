@@ -37,7 +37,7 @@ function broswerStart(){
       //gl.clear(gl.COLOR_BUFFER_BIT);
       //gl.clear(gl.DEPTH_BUFFER_BIT);
 
-      gl.renderScene(mainScene,mainCamera,matrix);
+      gl.renderScene(mainScene,matrix,mainCamera);
       requestAnimationFrame(loop);
     }
 //-------------------------------------------------------/loop function definitions-----------------------------------------------

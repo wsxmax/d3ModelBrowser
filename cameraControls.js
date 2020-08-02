@@ -47,7 +47,7 @@
   }
   cursor.rolled = function(dist){
     var v = vec3.create();
-    vec3.scale(v,mainCamera.direction,dist/5);
+    vec3.scale(v,mainCamera.direction,dist/50.0);
     mainCamera.move(v);
     console.log('scrolleddd:::',dist);
   }

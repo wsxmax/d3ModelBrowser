@@ -291,7 +291,7 @@ function extendRenderContext (contextObject){
   }
 
 
-  contextObject.renderPrimitive = function(primitiveObject,matrix){
+  contextObject.renderPrimitive = function(primitiveObject,matrix,camera){
     contextObject.usingProgram = primitiveObject.materialObject.program;
     if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=primitiveObject.indicesAccessor.bufferViewObject.renderBuffer){
       contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,primitiveObject.indicesAccessor.bufferViewObject.renderBuffer);
@@ -340,6 +340,7 @@ function extendRenderContext (contextObject){
           break;
         }
         case contextObject.SAMPLER_CUBE:{
+          if(uniformKey!='environmentTexture')
           contextObject.uniform1i(contextObject.getUniformLocation(contextObject.usingProgram,uniformKey),primitiveObject.materialObject.uniforms[uniformKey].textureObject.slot);
           break;
         }
@@ -347,7 +348,9 @@ function extendRenderContext (contextObject){
       }
     }
     var matrixLocation = contextObject.getUniformLocation(contextObject.usingProgram,'matrix');
+    contextObject.uniform1i(contextObject.getUniformLocation(contextObject.usingProgram,'environmentTexture'),contextObject.skyboxTexture.slot);
     contextObject.uniformMatrix4fv(matrixLocation,contextObject.FALSE,matrix);
+    contextObject.uniform3fv(contextObject.getUniformLocation(contextObject.usingProgram,'cameraCoord'),camera.position);
     contextObject.drawElements(contextObject.TRIANGLES,primitiveObject.indicesAccessor.count,contextObject.UNSIGNED_SHORT,primitiveObject.indicesAccessor.byteOffset);
 
   }
@@ -421,13 +424,13 @@ function extendRenderContext (contextObject){
     }
   }
 
-  contextObject.renderMesh = function(meshObject,matrix){
+  contextObject.renderMesh = function(meshObject,matrix,camera){
     for(var primitiveIndex = 0; primitiveIndex < meshObject.primitives.length; primitiveIndex++){
-      contextObject.renderPrimitive(meshObject.primitives[primitiveIndex],matrix);
+      contextObject.renderPrimitive(meshObject.primitives[primitiveIndex],matrix,camera);
     }
   }
 
-  contextObject.renderNode = function(nodeObject,matrix){
+  contextObject.renderNode = function(nodeObject,matrix,camera){
     var nodeMatrix = new Float32Array(16);
     if(nodeObject.hasOwnProperty('matrix')){
       mat4.multiply(nodeMatrix,matrix,nodeObject.matrix);
@@ -435,16 +438,16 @@ function extendRenderContext (contextObject){
       mat4.copy(nodeMatrix,matrix);
     }
     if(nodeObject.hasOwnProperty('meshObject')){
-      contextObject.renderMesh(nodeObject.meshObject,nodeMatrix);
+      contextObject.renderMesh(nodeObject.meshObject,nodeMatrix,camera);
     }
     if(nodeObject.hasOwnProperty('childrenObjects')){
       for(var childIndex = 0;childIndex < childrenObjects.length;childIndex ++){
-        contextObject.renderNode(childrenObjects[childIndex],nodeMatrix);
+        contextObject.renderNode(childrenObjects[childIndex],nodeMatrix,camera);
       }
     }
   }
 
-  contextObject.renderScene = function(sceneObject,camera,matrix){
+  contextObject.renderScene = function(sceneObject,matrix,camera){
     var renderMatrix = new Float32Array(16);
     var cameraMatrix = camera.generateMatrix();
     mat4.multiply(renderMatrix,cameraMatrix,sceneObject.sceneMatrix);
@@ -452,7 +455,7 @@ function extendRenderContext (contextObject){
       contextObject.renderSkybox(sceneObject.skybox,camera);
     }
     for(var nodeIndex = 0;nodeIndex < sceneObject.nodes.length;nodeIndex ++){
-      contextObject.renderNode(sceneObject.nodeObject[nodeIndex],renderMatrix);
+      contextObject.renderNode(sceneObject.nodeObject[nodeIndex],renderMatrix,camera);
     }
   }
 
