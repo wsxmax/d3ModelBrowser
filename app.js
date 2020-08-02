@@ -11,8 +11,8 @@ function broswerStart(){
   var sceneReady = false;
   var rebindingNeeded = true;
 
-  mainCamera = new camera([0,0,-10],[0,0,1],[0,1,0],90,mainCanvas.width,mainCanvas.height,1000,10);
-  ghostCamera = new camera([0,0,-10],[0,0,1],[0,1,0],90,mainCanvas.width,mainCanvas.height,1000,10);
+  mainCamera = new camera([0,0,-10],[0,0,1],[0,1,0],60,mainCanvas.width,mainCanvas.height,1000,10);
+  ghostCamera = new camera([0,0,-10],[0,0,1],[0,1,0],60,mainCanvas.width,mainCanvas.height,1000,10);
 
 
   var matrix = new Float32Array(16);

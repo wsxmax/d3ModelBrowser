@@ -77,7 +77,7 @@ class camera {
   }
 
   generateFactorForSkybox(){
-    return [this.width/2,this.height/2,-this.height/(2*Math.tan(this.viewAngle/2))];
+    return [this.width/2,this.height/2,-this.height/(2*Math.tan(this.viewAngle*0.017453293/2))];
   }
 
   generateSkyVectorMatrix(){
