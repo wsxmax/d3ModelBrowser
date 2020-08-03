@@ -44,13 +44,13 @@ function broswerStart(){
 
 //-----------------------------------------------------main process in order-----------------------------------------------------
     //gl.makeProgramFromURI('/shaders/defaultShaders/vertexShaderGLSL','/shaders/defaultShaders/fragmentShaderGLSL',function(renderProgram){
-    gl.makeProgramFromURI('https://gitee.com/Mitsunoryw/d3ModelBrowser/shaders/defaultShaders/vertexShaderGLSL','https://gitee.com/Mitsunoryw/d3ModelBrowser/shaders/defaultShaders/fragmentShaderGLSL',function(renderProgram){
+    gl.makeProgramFromURI(https://wsxmax.github.io/d3ModelBrowser/shaders/defaultShaders/vertexShaderGLSL',https://wsxmax.github.io/d3ModelBrowser/shaders/defaultShaders/fragmentShaderGLSL',function(renderProgram){
       gl.defaultProgram = renderProgram;
       programReady = true;
       if (sceneReady) gl.prepareForRender(mainScene,beginLoop);
     });
     //loadGltfFile('/gltf5/test.gltf',function(jsonObject){
-    loadGltfFile('https://gitee.com/Mitsunoryw/d3ModelBrowser/gltf2/j23gltf.gltf',function(jsonObject){
+    loadGltfFile(https://wsxmax.github.io/d3ModelBrowser/gltf2/j23gltf.gltf',function(jsonObject){
     //loadGltfFile('/gltf2/j23gltf.gltf',function(jsonObject){
       const gltfObject = jsonObject;
       console.log('showing the ObjectStructure',gltfObject);
@@ -60,7 +60,7 @@ function broswerStart(){
       gltfObject.loadImagesFromPath(gltfObject.originalPath);
       gltfObject.loadBufferFromPath(gltfObject.originalPath,function(){
         //mainScene.skybox = new skybox('/skybox','png');
-        mainScene.skybox = new skybox('https://gitee.com/Mitsunoryw/d3ModelBrowser/skybox','png');
+        mainScene.skybox = new skybox('https://wsxmax.github.io/d3ModelBrowser/skybox','png');
         gl.bufferObject(gltfObject);
         sceneReady = true;
         if (programReady) gl.prepareForRender(mainScene,beginLoop);
