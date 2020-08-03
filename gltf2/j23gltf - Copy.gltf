@@ -76,7 +76,10 @@
                     "attributes" : {
                         "POSITION" : 0,
                         "NORMAL" : 1,
-                        "TEXCOORD_0" : 3
+                        "TANGENT" : 2,
+                        "TEXCOORD_0" : 3,
+                        "TEXCOORD_1" : 4,
+                        "COLOR_0" : 5
                     },
                     "indices" : 6,
                     "material" : 0
@@ -85,7 +88,10 @@
                     "attributes" : {
                         "POSITION" : 7,
                         "NORMAL" : 8,
-                        "TEXCOORD_0" : 10
+                        "TANGENT" : 9,
+                        "TEXCOORD_0" : 10,
+                        "TEXCOORD_1" : 11,
+                        "COLOR_0" : 12
                     },
                     "indices" : 13,
                     "material" : 1
@@ -239,72 +245,86 @@
         {
             "buffer" : 0,
             "byteLength" : 8612532,
-            "byteOffset" : 0
+            "byteOffset" : 0,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 8612532,
-            "byteOffset" : 8612532
+            "byteOffset" : 8612532,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 11483376,
-            "byteOffset" : 17225064
+            "byteOffset" : 17225064,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 5741688,
-            "byteOffset" : 28708440
+            "byteOffset" : 28708440,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 5741688,
-            "byteOffset" : 34450128
+            "byteOffset" : 34450128,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 11483376,
-            "byteOffset" : 40191816
+            "byteOffset" : 40191816,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 4306644,
-            "byteOffset" : 51675192
+            "byteOffset" : 51675192,
+            "target" : 34963
         },
         {
             "buffer" : 0,
             "byteLength" : 883872,
-            "byteOffset" : 55981836
+            "byteOffset" : 55981836,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 883872,
-            "byteOffset" : 56865708
+            "byteOffset" : 56865708,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 1178496,
-            "byteOffset" : 57749580
+            "byteOffset" : 57749580,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 589248,
-            "byteOffset" : 58928076
+            "byteOffset" : 58928076,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 589248,
-            "byteOffset" : 59517324
+            "byteOffset" : 59517324,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 1178496,
-            "byteOffset" : 60106572
+            "byteOffset" : 60106572,
+            "target" : 34962
         },
         {
             "buffer" : 0,
             "byteLength" : 442368,
-            "byteOffset" : 61285068
+            "byteOffset" : 61285068,
+            "target" : 34963
         }
     ],
     "buffers" : [

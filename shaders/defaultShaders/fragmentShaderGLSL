@@ -36,9 +36,11 @@ void main()
   vec4 reflect0 = baseColor*(reflect1+reflect2+reflect3)/3.0;
 
   vec4 surfaceReflect = (reflect1+reflect2+reflect3)/3.0;
-  vec4 surfaceBaseColor = baseColor*(textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation))))+textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation))))+textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation)))));
+  vec4 surfaceBaseColor = baseColor*(textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation))))+textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation))))+textureCube(environmentTexture,reflect(cameraDirection(vertexLocation,cameraLocation),normalVector+(hash(vertexLocation)))))/3.0;
   float reflectRate = length(cross(cameraVector,normalVector));
+  //float reflectRate = 0.5;
   vec4 surfaceColor = reflectRate*surfaceReflect+(1.0-reflectRate)*surfaceBaseColor;
 
   gl_FragColor = metallic*reflect0+(1.0-metallic)*surfaceColor;
+  //gl_FragColor = vec4(0.0,0.0,0.0,1.0);
 }

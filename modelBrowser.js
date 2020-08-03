@@ -97,6 +97,7 @@ function makeContextForCanvas(renderCanvas){
 }
 
 function extendRenderContext (contextObject){
+  contextObject.getExtension('OES_element_index_uint');
   contextObject.scenes = [];
   contextObject.makeProgramFromText = function(vertexShaderText,fragmentShaderText){
     const vertexShader = contextObject.createShader(contextObject.VERTEX_SHADER);
@@ -140,6 +141,15 @@ function extendRenderContext (contextObject){
 
 
   contextObject.bufferObject = function(sceneObject){
+    for (var accessorIndex=0;accessorIndex<sceneObject.accessors.length;accessorIndex++){
+      if(sceneObject.accessors[accessorIndex].type=='SCALAR'){
+        if(!sceneObject.bufferViews[sceneObject.accessors[accessorIndex].bufferView].hasOwnProperty('target')){
+          sceneObject.bufferViews[sceneObject.accessors[accessorIndex].bufferView].target = 34963;
+        }
+      }else if (!sceneObject.bufferViews[sceneObject.accessors[accessorIndex].bufferView].hasOwnProperty('target')) {
+        sceneObject.bufferViews[sceneObject.accessors[accessorIndex].bufferView].target = 34962;
+      }
+    }
     for (var bufferViewIndex = 0;bufferViewIndex < sceneObject.bufferViews.length;bufferViewIndex++){
       sceneObject.bufferViews[bufferViewIndex].renderBuffer = contextObject.createBuffer();
       switch (sceneObject.bufferViews[bufferViewIndex].target) {
@@ -163,7 +173,7 @@ function extendRenderContext (contextObject){
       case "VEC2" : return 2;
       case "VEC3" :return 3;
       case "VEC4" :return 4;
-      default : return null;
+      default : console.log('ERRO IN ATTRIBUTE TYPE');return null;
     }
   }
 
@@ -343,6 +353,7 @@ function extendRenderContext (contextObject){
     contextObject.usingProgram = primitiveObject.materialObject.program;
     //if(contextObject.getParameter(contextObject.ELEMENT_ARRAY_BUFFER_BINDING)!=primitiveObject.indicesAccessor.bufferViewObject.renderBuffer){
       contextObject.bindBuffer(contextObject.ELEMENT_ARRAY_BUFFER,primitiveObject.indicesAccessor.bufferViewObject.renderBuffer);
+
     //}
     if(primitiveObject.materialObject.hasOwnProperty('program')){
       if(contextObject.getParameter(contextObject.CURRENT_PROGRAM) != primitiveObject.materialObject.program){
@@ -371,8 +382,8 @@ function extendRenderContext (contextObject){
         attributeLocation,
         contextObject.attributeSize(primitiveObject.attributes.attributeAccessors[attributeKey].type),
         primitiveObject.attributes.attributeAccessors[attributeKey].componentType,
-        contextObject.FLOAT,
-        contextObject.TRUE,
+        //contextObject.FLOAT,
+        contextObject.FALSE,
         primitiveObject.attributes.attributeAccessors[attributeKey].bufferViewObject.byteStride,
         primitiveObject.attributes.attributeAccessors[attributeKey].byteOffset
       );
@@ -399,7 +410,11 @@ function extendRenderContext (contextObject){
     contextObject.uniform1i(contextObject.getUniformLocation(contextObject.usingProgram,'environmentTexture'),contextObject.skyboxTexture.slot);
     contextObject.uniformMatrix4fv(matrixLocation,contextObject.FALSE,matrix);
     contextObject.uniform3fv(contextObject.getUniformLocation(contextObject.usingProgram,'cameraCoord'),camera.position);
-    contextObject.drawElements(contextObject.TRIANGLES,primitiveObject.indicesAccessor.count,contextObject.UNSIGNED_SHORT,primitiveObject.indicesAccessor.byteOffset);
+    var elementType = contextObject.UNSIGNED_SHORT;
+    if(primitiveObject.indicesAccessor.componentType == 5125){
+      elementType = contextObject.UNSIGNED_INT;
+    }
+    contextObject.drawElements(contextObject.TRIANGLES,primitiveObject.indicesAccessor.count,elementType,primitiveObject.indicesAccessor.byteOffset);
 
   }
 
@@ -484,6 +499,12 @@ function extendRenderContext (contextObject){
       mat4.multiply(nodeMatrix,matrix,nodeObject.matrix);
     }else{
       mat4.copy(nodeMatrix,matrix);
+    }
+    if(nodeObject.hasOwnProperty('scale')){
+      mat4.scale(nodeMatrix,nodeMatrix,nodeObject.scale);
+    }
+    if(nodeObject.hasOwnProperty('translation')){
+      mat4.translate(nodeMatrix,nodeMatrix,nodeObject.translation);
     }
     if(nodeObject.hasOwnProperty('meshObject')){
       contextObject.renderMesh(nodeObject.meshObject,nodeMatrix,camera);

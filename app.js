@@ -48,8 +48,9 @@ function broswerStart(){
       programReady = true;
       if (sceneReady) gl.prepareForRender(mainScene,beginLoop);
     });
-    loadGltfFile('/gltf2/j23gltf.gltf',function(jsonObject){
+    //loadGltfFile('/gltf5/test.gltf',function(jsonObject){
     //loadGltfFile('/gltf/Suzanne.gltf',function(jsonObject){
+    loadGltfFile('/gltf2/j23gltf.gltf',function(jsonObject){
       const gltfObject = jsonObject;
       console.log('showing the ObjectStructure',gltfObject);
       mainScene = gltfObject.scenes[gltfObject.scene];
